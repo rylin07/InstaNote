@@ -1,0 +1,84 @@
+/* Container styling for ChatGPT */
+.chatgpt-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 300px;
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 1000;
+  }
+  
+  /* Chat header styling */
+  .chatgpt-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+  }
+  
+  .close-button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  /* Messages area styling */
+  .chatgpt-messages {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+    background-color: #ffffff;
+  }
+  
+  .chatgpt-message {
+    padding: 10px;
+    border-radius: 5px;
+    margin: 5px 0;
+    font-size: 14px;
+    max-width: 80%;
+  }
+  
+  .gpt-message {
+    background-color: #e1f0ff;
+    align-self: flex-start;
+  }
+  
+  .user-message {
+    background-color: #d4edda;
+    align-self: flex-end;
+  }
+  
+  /* Input area styling */
+  .chatgpt-input {
+    display: flex;
+    border-top: 1px solid #ccc;
+  }
+  
+  .chatgpt-input input {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    outline: none;
+  }
+  
+  .chatgpt-input button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  .chatgpt-input button:hover {
+    background-color: #0056b3;
+  }  
