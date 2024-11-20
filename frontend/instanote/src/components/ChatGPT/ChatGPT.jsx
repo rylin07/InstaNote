@@ -6,9 +6,38 @@ const ChatGPT = ({ onClose, onCreateNote }) => {
     { text: "How can I help?", sender: "gpt" },
   ]);
   const [userMessage, setUserMessage] = useState("");
-  const [note, setNote] = useState({ title: "", content: "" }); // State for note data
-  const [awaitingTitle, setAwaitingTitle] = useState(false); // Awaiting user input for title
-  const [awaitingContent, setAwaitingContent] = useState(false); // Awaiting user input for content
+  const [note, setNote] = useState({ title: "", content: "" });
+  const [awaitingTitle, setAwaitingTitle] = useState(false);
+  const [awaitingContent, setAwaitingContent] = useState(false);
+
+  // Improved function to detect note creation intent
+  const detectNoteCreationIntent = (message) => {
+    const lowerMessage = message.toLowerCase();
+
+    // Keywords and phrases for note creation
+    const keywords = [
+      "create note",
+      "add a note",
+      "make a note",
+      "new note",
+      "write a note",
+      "note",
+    ];
+
+    // Check if the message contains any of the keywords
+    return keywords.some((keyword) => lowerMessage.includes(keyword));
+  };
+
+  // Helper function to parse commands for title and content
+  const parseNoteCommand = (message) => {
+    const regex = /(?:title[d]?\s?"(.*?)")?.*?(?:content\s?"(.*?)")?/i;
+    const match = message.match(regex);
+
+    const title = match && match[1] ? match[1] : null;
+    const content = match && match[2] ? match[2] : null;
+
+    return { title, content };
+  };
 
   const handleSendMessage = () => {
     if (!userMessage.trim()) return;
@@ -16,12 +45,50 @@ const ChatGPT = ({ onClose, onCreateNote }) => {
     // Add user message to chat
     setMessages([...messages, { text: userMessage, sender: "user" }]);
 
-    // Handle note creation logic
+    // Check if the user intends to create a note
+    if (detectNoteCreationIntent(userMessage)) {
+      const { title, content } = parseNoteCommand(userMessage);
+
+      if (title && content) {
+        // If both title and content are provided, create the note
+        setMessages((prev) => [
+          ...prev,
+          { text: `Creating note titled "${title}" with content "${content}".`, sender: "gpt" },
+        ]);
+        onCreateNote({ title, content });
+        setUserMessage("");
+        return;
+      }
+
+      if (title) {
+        // If only the title is provided, ask for the content
+        setNote({ title, content: "" });
+        setMessages((prev) => [
+          ...prev,
+          { text: `Got it! What would you like the content of "${title}" to be?`, sender: "gpt" },
+        ]);
+        setAwaitingContent(true);
+        setAwaitingTitle(false);
+        setUserMessage("");
+        return;
+      }
+
+      // If no title or content is provided, ask for the title
+      setMessages((prev) => [
+        ...prev,
+        { text: "What would you like to title the note?", sender: "gpt" },
+      ]);
+      setAwaitingTitle(true);
+      setUserMessage("");
+      return;
+    }
+
+    // Handle input when waiting for title
     if (awaitingTitle) {
       setNote((prev) => ({ ...prev, title: userMessage }));
       setMessages((prev) => [
         ...prev,
-        { text: "What would you like the content of the note to be?", sender: "gpt" },
+        { text: `Got it! What would you like the content of "${userMessage}" to be?`, sender: "gpt" },
       ]);
       setAwaitingTitle(false);
       setAwaitingContent(true);
@@ -29,40 +96,28 @@ const ChatGPT = ({ onClose, onCreateNote }) => {
       return;
     }
 
+    // Handle input when waiting for content
     if (awaitingContent) {
       setNote((prev) => ({ ...prev, content: userMessage }));
       setMessages((prev) => [
         ...prev,
-        { text: "Note created! Opening the editor...", sender: "gpt" },
+        { text: `Note created with title "${note.title}" and content "${userMessage}".`, sender: "gpt" },
       ]);
-      setUserMessage("");
-      setAwaitingContent(false);
-
-      // Trigger note creation modal with pre-filled data
       onCreateNote({
         title: note.title,
         content: userMessage,
       });
+      setAwaitingContent(false);
+      setUserMessage("");
       return;
     }
 
-    // Simulate GPT response (general interaction)
-    setTimeout(() => {
-      if (userMessage.toLowerCase().includes("create a note")) {
-        setMessages((prev) => [
-          ...prev,
-          { text: "What would you like to title the note?", sender: "gpt" },
-        ]);
-        setAwaitingTitle(true);
-      } else {
-        setMessages((prev) => [
-          ...prev,
-          { text: "I'm here to help! Let me know what you need.", sender: "gpt" },
-        ]);
-      }
-    }, 1000);
+    // Default response for other messages
+    setMessages((prev) => [
+      ...prev,
+      { text: "I'm here to help! Let me know what you need.", sender: "gpt" },
+    ]);
 
-    // Clear input field
     setUserMessage("");
   };
 
