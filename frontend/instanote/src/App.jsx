@@ -1,6 +1,8 @@
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import Home from "./pages/Home/Home";
+import Home from "./pages/Home/Home"; // Selection Page
+import NotesDashboard from "./pages/NotesDashboard/NotesDashboard"; // Notes Dashboard
+import FlashcardsDashboard from "./pages/FlashcardsDashboard/FlashcardsDashboard";
 import Login from "./pages/Login/Login";
 import SignUp from "./pages/SignUp/SignUp";
 
@@ -10,7 +12,9 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Root />} />
-          <Route path="/dashboard" exact element={<Home />} />
+          <Route path="/dashboard" exact element={<Home />} /> {/* Selection Page */}
+          <Route path="/notes" exact element={<NotesDashboard />} /> {/* Notes Dashboard */}
+          <Route path="/flashcards" exact element={<FlashcardsDashboard />} /> {/* Flashcards Dashboard */}
           <Route path="/login" exact element={<Login />} />
           <Route path="/signUp" exact element={<SignUp />} />
         </Routes>
