@@ -1,61 +1,87 @@
 import React, { useState } from "react";
+import TagInput from "../../components/Input/TagInput";
+import { MdClose } from "react-icons/md";
+import axiosInstance from "../../utils/axiosInstance";
 
-const AddEditNotes = ({ type, noteData, onClose, showToastMessage, getAllNotes }) => {
+const AddEditNotes = ({ noteData, type, onClose, showToastMessage, getAllNotes }) => {
   const [title, setTitle] = useState(noteData?.title || "");
   const [content, setContent] = useState(noteData?.content || "");
+  const [tags, setTags] = useState(noteData?.tags || []);
+  const [error, setError] = useState("");
 
-  const handleSave = async () => {
-    // Mock API request to save or update note
-    const apiEndpoint = type === "edit" ? `/update-note/${noteData._id}` : "/create-note";
+  const handleSaveNote = async () => {
+    if (!title.trim()) {
+      setError("Please enter a title.");
+      return;
+    }
+
+    if (!content.trim()) {
+      setError("Please enter content for the note.");
+      return;
+    }
+
+    const endpoint = type === "edit" ? `/edit-note/${noteData._id}` : "/add-note";
+    const method = type === "edit" ? "PUT" : "POST";
 
     try {
-      const response = await fetch(apiEndpoint, {
-        method: type === "edit" ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, content }),
+      const response = await axiosInstance({
+        method,
+        url: endpoint,
+        data: { title, content, tags },
       });
 
-      if (response.ok) {
-        showToastMessage(
-          type === "edit" ? "Note updated successfully!" : "Note added successfully!",
-          type
-        );
-        getAllNotes(); // Refresh the notes list
-        onClose(); // Close the modal
-      } else {
-        console.error("Failed to save note");
+      if (response.data) {
+        showToastMessage(type === "edit" ? "Note updated successfully!" : "Note created successfully!", type);
+        getAllNotes();
+        onClose();
       }
     } catch (error) {
       console.error("Error saving note:", error);
+      setError("An unexpected error occurred. Please try again.");
     }
   };
 
   return (
-    <div>
-      <h2 className="text-xl font-bold mb-4">{type === "edit" ? "Edit Note" : "Add Note"}</h2>
-      <div className="flex flex-col gap-4">
-        <input
-          type="text"
-          placeholder="Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="p-2 border rounded"
-        />
-        <textarea
-          placeholder="Content"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          className="p-2 border rounded"
-        />
-      </div>
-      <div className="flex justify-end gap-4 mt-4">
-        <button onClick={onClose} className="px-4 py-2 bg-gray-300 rounded">
-          Cancel
-        </button>
-        <button onClick={handleSave} className="px-4 py-2 bg-blue-500 text-white rounded">
-          Save
-        </button>
-      </div>
+    <div className="relative bg-white p-6 rounded-lg shadow-lg">
+      <button
+        className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+        onClick={onClose}
+      >
+        <MdClose size={24} />
+      </button>
+
+      <h2 className="text-2xl font-bold mb-6">
+        {type === "edit" ? "Edit Note" : "Create Note"}
+      </h2>
+
+      <label className="block mb-2 font-medium text-gray-700">Title</label>
+      <input
+        type="text"
+        placeholder="Enter a title"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        className="w-full mb-4 p-2 border rounded"
+      />
+
+      <label className="block mb-2 font-medium text-gray-700">Content</label>
+      <textarea
+        placeholder="Enter the content for your note"
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        className="w-full mb-4 p-2 border rounded h-32"
+      />
+
+      <label className="block mb-2 font-medium text-gray-700">Tags</label>
+      <TagInput tags={tags} setTags={setTags} />
+
+      {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+
+      <button
+        onClick={handleSaveNote}
+        className="w-full mt-6 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+      >
+        {type === "edit" ? "Update Note" : "Create Note"}
+      </button>
     </div>
   );
 };
