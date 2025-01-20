@@ -13,7 +13,7 @@ const Home = () => {
           Welcome to InstaNote
         </h1>
         <p className="text-lg mb-8 text-gray-600">
-          Choose between managing your Notes or Flashcards to get started.
+          Choose between managing your Notes or Flashcards.
         </p>
         <div className="flex gap-6">
           <button
