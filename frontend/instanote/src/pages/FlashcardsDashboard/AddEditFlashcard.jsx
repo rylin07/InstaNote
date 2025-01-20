@@ -3,6 +3,7 @@ import React, { useState } from "react";
 const AddEditFlashcard = ({ type, flashcardData, onClose, showToastMessage, getAllFlashcards }) => {
   const [title, setTitle] = useState(flashcardData?.title || "");
   const [content, setContent] = useState(flashcardData?.content || "");
+  const [tags, setTags] = useState(flashcardData?.tags?.join(", ") || "");
 
   const handleSave = async () => {
     try {
@@ -12,7 +13,7 @@ const AddEditFlashcard = ({ type, flashcardData, onClose, showToastMessage, getA
       const response = await fetch(endpoint, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, content }),
+        body: JSON.stringify({ title, content, tags: tags.split(",").map(tag => tag.trim()) }),
       });
 
       if (response.ok) {
@@ -44,6 +45,13 @@ const AddEditFlashcard = ({ type, flashcardData, onClose, showToastMessage, getA
         value={content}
         onChange={(e) => setContent(e.target.value)}
         placeholder="Content"
+        className="border p-2 w-full mb-4"
+      />
+      <input
+        type="text"
+        value={tags}
+        onChange={(e) => setTags(e.target.value)}
+        placeholder="Tags (comma-separated)"
         className="border p-2 w-full mb-4"
       />
       <div className="flex justify-end gap-4">

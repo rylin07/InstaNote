@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../../components/Navbar/Navbar";
-import FlashcardCard from "../../components/Cards/FlashcardCard";
+import Flashcard from "../../components/cards/Flashcard";
 import { MdAdd } from "react-icons/md";
 import Modal from "react-modal";
 import AddEditFlashcard from "./AddEditFlashcard";
@@ -110,10 +110,9 @@ const FlashcardsDashboard = () => {
         {allFlashcards.length > 0 ? (
           <div className="grid grid-cols-3 gap-4 mt-8">
             {allFlashcards.map((item) => (
-              <FlashcardCard
+              <Flashcard
                 key={item._id}
-                title={item.title}
-                content={item.content}
+                flashcard={item}
                 onEdit={() => handleEdit(item)}
                 onDelete={() => deleteFlashcard(item)}
               />
